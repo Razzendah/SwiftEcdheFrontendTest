@@ -43,7 +43,7 @@ jobs:
         swift test
 
     - name: Test CryptoKit Availability (Fallback)
-      if: steps.check-package.outputs.package_exists == 'false'
+      if: steps.check-package.outputs.package_exists == 'true'
       run: |
         echo 'import CryptoKit
         import Foundation

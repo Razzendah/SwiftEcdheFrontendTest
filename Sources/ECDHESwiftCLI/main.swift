@@ -52,13 +52,13 @@ func testCryptoAvailability() {
         let publicKey = privateKey.publicKey
         print("✅ P-256 ECDHE key generation: SUCCESS")
         print("   Public key size: \(publicKey.rawRepresentation.count) bytes")
+        print("   DER format size: \(publicKey.derRepresentation.count) bytes")
         
         // Test AES-GCM
         let data = "Hello, ECDHE!".data(using: .utf8)!
         let sealedData = try AES.GCM.seal(data, using: symmetricKey)
         let decryptedData = try AES.GCM.open(sealedData, using: symmetricKey)
         print("✅ AES-GCM encryption/decryption: SUCCESS")
-        
     } catch {
         print("❌ Crypto test failed: \(error)")
     }
