@@ -1,8 +1,10 @@
 # filepath: .github/workflows/build.yml
-name: Build and Test Swift
+name: Build and Test Swift ECDHE CLI
 
 on:
   push:
+    branches: [ main ]
+  pull_request:
     branches: [ main ]
 
 jobs:
@@ -14,14 +16,47 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Select Xcode Version
-      run: sudo xcode-select -s /Applications/Xcode.app
+      run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
-    - name: Build and Run Swift Code
+    - name: Check Swift Version
+      run: swift --version
+
+    - name: Check if Swift Package exists
+      id: check-package
       run: |
-        # If you have a Swift package
-        # swift build
-        # swift test
+        if [ -f "Package.swift" ]; then
+          echo "package_exists=true" >> $GITHUB_OUTPUT
+          echo "Swift package found"
+        else
+          echo "package_exists=false" >> $GITHUB_OUTPUT
+          echo "No Swift package found"
+        fi
 
-        # Or if you have a single Swift file with CryptoKit
-        echo 'import CryptoKit; let key = SymmetricKey(size: .bits256); print("Successfully used CryptoKit!")' > test.swift
-        # swift test.swift
+    - name: Build Swift Package
+      if: steps.check-package.outputs.package_exists == 'true'
+      run: |
+        swift build
+        
+    - name: Run Tests
+      if: steps.check-package.outputs.package_exists == 'true'
+      run: |
+        swift test
+
+    - name: Test CryptoKit Availability (Fallback)
+      if: steps.check-package.outputs.package_exists == 'false'
+      run: |
+        echo 'import CryptoKit
+        import Foundation
+
+        let key = SymmetricKey(size: .bits256)
+        print("✅ CryptoKit is available!")
+        print("Generated key size: \(key.bitCount) bits")
+
+        // Test P256 curve (used in ECDHE)
+        let privateKey = P256.KeyAgreement.PrivateKey()
+        let publicKey = privateKey.publicKey
+        print("✅ P256 ECDHE key generation successful!")
+        print("Public key format available: \(publicKey.rawRepresentation.count) bytes")
+        ' > test_cryptokit.swift
+        
+        swift test_cryptokit.swift
