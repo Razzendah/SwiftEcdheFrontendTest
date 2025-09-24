@@ -1,0 +1,27 @@
+# filepath: .github/workflows/build.yml
+name: Build and Test Swift
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Select Xcode Version
+      run: sudo xcode-select -s /Applications/Xcode.app
+
+    - name: Build and Run Swift Code
+      run: |
+        # If you have a Swift package
+        swift build
+        swift test
+
+        # Or if you have a single Swift file with CryptoKit
+        # echo 'import CryptoKit; let key = SymmetricKey(size: .bits256); print("Successfully used CryptoKit!")' > test.swift
+        # swift test.swift
