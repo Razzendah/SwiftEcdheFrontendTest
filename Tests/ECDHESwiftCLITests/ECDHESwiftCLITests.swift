@@ -20,8 +20,13 @@ final class ECDHESwiftCLITests: XCTestCase {
         let publicKey = privateKey.publicKey
         
         // Verify key properties
-        XCTAssertEqual(publicKey.rawRepresentation.count, 65) // Uncompressed format: 1 + 32 + 32
+        // P-256 public key in raw format is 64 bytes (32 bytes X + 32 bytes Y coordinates)
+        // This is the compressed/compact format used by CryptoKit
+        XCTAssertEqual(publicKey.rawRepresentation.count, 64) // Compact format: 32 + 32 (X + Y coordinates)
         XCTAssertGreaterThan(publicKey.derRepresentation.count, 0)
+        
+        // Additional verification - DER format should be larger than raw
+        XCTAssertGreaterThan(publicKey.derRepresentation.count, publicKey.rawRepresentation.count)
     }
     
     func testAESGCMEncryption() throws {
