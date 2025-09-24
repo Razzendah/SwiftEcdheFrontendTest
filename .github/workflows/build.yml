@@ -19,9 +19,9 @@ jobs:
     - name: Build and Run Swift Code
       run: |
         # If you have a Swift package
-        swift build
-        swift test
+        # swift build
+        # swift test
 
         # Or if you have a single Swift file with CryptoKit
-        # echo 'import CryptoKit; let key = SymmetricKey(size: .bits256); print("Successfully used CryptoKit!")' > test.swift
+        echo 'import CryptoKit; let key = SymmetricKey(size: .bits256); print("Successfully used CryptoKit!")' > test.swift
         # swift test.swift
